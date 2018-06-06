@@ -19,6 +19,7 @@ locate gsl_sf_coupling.h
 locate libgsl.a
 ```
 You need to specify the path to folder `gsl/` where the headers are stored with the frag `-I`. The path to the library has to be given with the flag `-L`.
+
   2. Compile and link
 ```
 g++ -std=c++11 -L${PATH_TO_LIBRARY} -I${PATH_TO_GSL_FOLDER} -o Example Example.cc -lgsl
