@@ -50,13 +50,20 @@ double jacobi_pols(uint n, uint a, uint b, double x) {
 // Eq. (3.74) of L. Biedenharn, J. Louck, and P. Carruthers, Angular Momentum in Quantum Physics: Theory and Application
 // see also (B1) of the FormalismII paper.
 double wignerd_hat(uint j, uint m1, uint m2, double z) {
-        double factor = (abs(m1-m2)+m1-m2)/2 % 2 == 0 ? 1.0 : -1.0;
+        double factor = ((abs(m1-m2)+m1-m2)/2) % 2 == 0 ? 1.0 : -1.0;
         int am1 = abs(m1), am2 = abs(m2);
         double M = (am1 > am2) ? am1 : am2;
-        double N = (am1 < am2) ? am2 : am1;
+        double N = (am1 < am2) ? am1 : am2;
         return factor/pow(2,M)*
-               sqrt(gsl_sf_gamma(j-M+1)*gsl_sf_gamma(j+M+1)/gsl_sf_gamma(j-N+1)/gsl_sf_gamma(j+N+1))*
+               sqrt(gsl_sf_gamma(j-M+1)*gsl_sf_gamma(j+M+1)/(gsl_sf_gamma(j-N+1)*gsl_sf_gamma(j+N+1)))*
                jacobi_pols(j-M, abs(m1-m2),abs(m1+m2), z);
 }
+
+double wignerd(uint j, uint m1, uint m2, double z) {
+        double hat = wignerd_hat(j, m1, m2, z);
+        double xi = pow(sqrt(1-z),abs(m1-m2))*pow(sqrt((1+z)),abs(m1+m2));
+        return hat*xi;
+}
+
 
 }
