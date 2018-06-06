@@ -1,19 +1,20 @@
-// Copyright [06/2018] Misha Mikhasenko, mikhail.mikhasenko@gmail.com
+// [06/2018] Misha Mikhasenko, mikhail.mikhasenko@gmail.com
 
 #include <iostream>
 #include <vector>
 #include <complex>
 #include <functional>
 #include <map>
-#include <gsl/gsl_sf_coupling.h>
-#include <gsl/gsl_sf_gamma.h>
+
+#include "SpecialFunctions.cc"
+
 //------------------------------------------------------------------------------//
 //------------------------------------------------------------------------------//
 //----------------------THE EQUATIONS FROM THE APPENDIX B-----------------------//
 //-----------------------------------------------------------EPC ?? ??? ??------//
 //------------------------------------------------------------------------------//
 
-#define mJpsi 3.0969
+#define mPsi 3.686
 #define mB   5.279
 #define mPi  0.13957
 #define mK   0.49368
@@ -27,7 +28,7 @@ typedef std::complex<double> cd;
 namespace FormalismI {
 
 const double sqrt2 = sqrt(2);
-const double m1sq = mJpsi*mJpsi;
+const double m1sq = mPsi*mPsi;
 const double m2sq = mB*mB;
 const double m3sq = mPi*mPi;
 const double m4sq = mK*mK;
@@ -91,56 +92,13 @@ double zx(char ch, double s, double t) {
                (t*(s-u)+(m1sq-m3sq)*(m2sq-m4sq))/sqrt(lambda13(t)*lambda24(t));
 }
 
-//------------------------------------------------------------------------------//
-
-double clebsch_gordon(uint j1, uint m1, uint j2, uint m2, uint j, uint m) {
-        return (j1-j2+m % 2 == 1 ? -1.0 : 1.0)*sqrt(2*j+1)*
-                gsl_sf_coupling_3j(2*j1,2*m1,2*j2,2*m2,2*j,-2*m);
-}
-
-double jacobi_pols(uint n, uint a, uint b, double x) {
-        // here comes the calculation of log(n!)
-        const double logfact[] = {0.0, 0.0,
-                                6.93147180559945309e-1, 1.79175946922805500e00,
-                                3.17805383034794562e00, 4.78749174278204599e00,
-                                6.57925121201010100e00, 8.52516136106541430e00,
-                                1.06046029027452502e01, 1.28018274800814696e01,
-                                1.51044125730755153e01, 1.75023078458738858e01,
-                                1.99872144956618861e01, 2.25521638531234229e01,
-                                2.51912211827386815e01, 2.78992713838408916e01,
-                                3.06718601060806728e01, 3.35050734501368889e01,
-                                3.63954452080330536e01, 3.93398841871994940e01,
-                                4.23356164607534850e01, 4.53801388984769080e01,
-                                4.84711813518352239e01, 5.16066755677643736e01};
-        double ls = log((1.0-x)/2.0);
-        double lc = log((1.0+x)/2.0);
-        double res = 0.0;
-        for (uint s = 0; s <= n; s++) {
-                double logs = logfact[n+a] + logfact[n+b]-logfact[n-s]-logfact[a+s]-logfact[s]-logfact[n+b-s];
-                double args = s*ls + (n-s)*lc;
-                res = (s % 2 == 0 ? 1.0 : -1.0) * exp(logs+args);
-        }
-        return res;
-}
-
-
-double wignerd_hat(uint j, uint m1, uint m2, double z) {
-        double factor = (abs(m1-m2)+m1-m2)/2 % 2 == 0 ? 1.0 : -1.0;
-        int am1 = abs(m1), am2 = abs(m2);
-        double M = (am1 > am2) ? am1 : am2;
-        double N = (am1 < am2) ? am2 : am1;
-        return factor/pow(2,M)*
-                sqrt(gsl_sf_gamma(j-M+1)*gsl_sf_gamma(j+M+1)/gsl_sf_gamma(j-N+1)/gsl_sf_gamma(j+N+1))*
-                jacobi_pols(j-M, abs(m1-m2),abs(m1+m2), z);
-}
-
 //-------------------------------XI-FUNCTIONS-----------------------------------//
 
 double xi_minu(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
         double val = pow(pq,j-1)/(4*M_PI*sqrt2)*sqrt((2*j+1)*(2*j-1)) *
-                     clebsch_gordon(j-1,0,1,1,j,1) *
-                     wignerd_hat(j,1,0,zx);
+                     SpecialFunc::clebsch_gordon(j-1,0,1,1,j,1) *
+                     SpecialFunc::wignerd_hat(j,1,0,zx);
         return val;
 }
 
@@ -152,8 +110,8 @@ double xi_zero(char ch, uint j, double x, double zx) {
 double xi_plus(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
         double val = pow(pq,j-1)/(4*M_PI*sqrt2)*sqrt((2*j+1)*(2*j-1)) *
-                     clebsch_gordon(j-1,0,1,1,j,1) *
-                     wignerd_hat(j,1,0,zx);
+                     SpecialFunc::clebsch_gordon(j-1,0,1,1,j,1) *
+                     SpecialFunc::wignerd_hat(j,1,0,zx);
         return val;
 }
 
@@ -165,10 +123,10 @@ double beta_minu(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
         double val = 4*m1sq*pow(pq,j)/(4*M_PI*lambda1x(ch,x)) * (x+m1sq-mxsq(ch))/(sqrt2*m1sq)*
                      sqrt((2*j+1)*(2*j-1))*(
-                clebsch_gordon(j-1,0,1,0,j,0) *
-                wignerd_hat(j,0,0,zx)/sqrt2 +
-                clebsch_gordon(j-1,0,1,1,j,1) *
-                wignerd_hat(j,1,0,zx)*zx
+                SpecialFunc::clebsch_gordon(j-1,0,1,0,j,0) *
+                SpecialFunc::wignerd_hat(j,0,0,zx)/sqrt2 +
+                SpecialFunc::clebsch_gordon(j-1,0,1,1,j,1) *
+                SpecialFunc::wignerd_hat(j,1,0,zx)*zx
                 );
         return val;
 }
@@ -182,16 +140,16 @@ double beta_plus(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
         double val = 4*m1sq*pow(pq,j)/(4*M_PI*lambda1x(ch,x)) * (x+m1sq-mxsq(ch))/(sqrt2*m1sq)*
                      sqrt((2*j+1)*(2*j+3))*(
-                clebsch_gordon(j+1,0,1,0,j,0) *
-                wignerd_hat(j,0,0,zx)/sqrt2 +
-                clebsch_gordon(j+1,0,1,1,j,1) *
-                wignerd_hat(j,1,0,zx)*zx
+                SpecialFunc::clebsch_gordon(j+1,0,1,0,j,0) *
+                SpecialFunc::wignerd_hat(j,0,0,zx)/sqrt2 +
+                SpecialFunc::clebsch_gordon(j+1,0,1,1,j,1) *
+                SpecialFunc::wignerd_hat(j,1,0,zx)*zx
                 );
         return val;
 }
 
 std::vector<std::function<double(char,uint,double,double)> > beta =
-{xi_minu, xi_zero, xi_plus};
+{beta_minu, beta_zero, beta_plus};
 
 //-------------------------------DELTA-FUNCTIONS--------------------------------//
 
@@ -202,7 +160,7 @@ double delta_minu(char ch, uint j, double x, double zx) {
 
 double delta_zero(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
-        double val = sqrt2/(4*M_PI)*(2*j+1)*pow(pq, j-1)*wignerd_hat(j,1,0,zx);
+        double val = sqrt2/(4*M_PI)*(2*j+1)*pow(pq, j-1)*SpecialFunc::wignerd_hat(j,1,0,zx);
         return val;
 }
 
@@ -215,6 +173,7 @@ std::vector<std::function<double(char,uint,double,double)> > delta =
 {delta_minu, delta_zero, delta_plus};
 
 //-------------------------------COVARIANT-FUNCTIONS----------------------------//
+
 double fourv_prod(const std::vector<double> &p1, const std::vector<double> &p2) {
         if (p1.size() != 4 || p2.size() != 4) std::cerr << "Error: p.size() != 4, something is wrong!\n";
         return p1[3]*p2[3]-p1[0]*p2[0]-p1[1]*p2[1]-p1[2]*p2[2];
@@ -295,7 +254,10 @@ void construct_structres(struct_map &fvmap, const std::vector<double> vecs[6]) {
 
 // combined function for the xi, beta, delta
 double xi_beta_delta(char Zi, char ch, uint j, uint l, double x, double zx) {
-        if (abs(j-l)>1) return 0.0;
+        if (abs(j-l) > 1) {
+                // std::cerr << "Note: abs(j-l) > 1\n";
+                return 0.0;
+        }
         uint f_index = l-j+1;
 
         switch(Zi) {
@@ -303,6 +265,7 @@ double xi_beta_delta(char Zi, char ch, uint j, uint l, double x, double zx) {
         case 'B': return beta.at(f_index)(ch, j, x, zx);
         case 'D': return delta.at(f_index)(ch, j, x, zx);
         }
+        std::cerr << "Error: the switch-case did not work!\n";
 }
 
 cd V_form(char ch_i, uint j_i, uint l_i,
@@ -317,7 +280,7 @@ cd V_form(char ch_i, uint j_i, uint l_i,
                         double fvc_ij = st_map.at(std::make_pair(std::make_pair(ch_i, Zi),std::make_pair(ch_j, Zj)));
                         // this block can be speeded up
                         double xbd_i = xi_beta_delta(Zi, ch_i, j_i, l_i, x(ch_i,s,t), zx(ch_i,s,t)); //! CAN BE PRECALCULATED
-                        double xbd_j = xi_beta_delta(Zj, ch_j, j_j, l_j, x(ch_i,s,t), zx(ch_i,s,t)); //! CAN BE PRECALCULATED
+                        double xbd_j = xi_beta_delta(Zj, ch_j, j_j, l_j, x(ch_j,s,t), zx(ch_j,s,t)); //! CAN BE PRECALCULATED
                         fvc_ij *= xbd_i*xbd_j;
                         // --------------------------
                         val += fvc_ij;
@@ -359,7 +322,7 @@ double density(const std::vector<isobar> &isobars, const std::vector<cd> &coupli
                         //-----------------------------------------//
                 }
         }
-        std::cout << "Imag part suppose to be zero! Im@Rho = " << density << "\n";
+        std::cout << "Imag part suppose to be zero! Rho(re,im) = " << density << "\n";
         return real(density);
 }
 

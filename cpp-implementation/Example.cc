@@ -1,4 +1,4 @@
-// Copyright [06/2018] Misha Mikhasenko, mikhail.mikhasenko@gmail.com
+// [06/2018] Misha Mikhasenko, mikhail.mikhasenko@gmail.com
 
 #include <iostream>
 #include <vector>
@@ -76,7 +76,10 @@ int main() {
         isobars.push_back(Ks_Dwave);
 
         // vector of couplings
-        std::vector<cd> couplings(isobars.size()); // the values are to be set
+        std::vector<cd> couplings(isobars.size());
+        // the values are to be set
+        couplings[0] = cd(3.0, 0.1);
+        couplings[1] = cd(5.0, 0.1);
         std::cout << "----> The isobars are created!\n";
 
         // ----------------------------------------
@@ -85,30 +88,28 @@ int main() {
         double s_input = 2.25;
         // this function returns p1, p2, p3, p4
         std::vector<std::vector<double> > ps = Generator::make_up_some_vectors(s_input, 0.3, 0.0,
-                FormalismI::m1sq, FormalismI::m2sq, FormalismI::m3sq, FormalismI::m4sq);
-        std::cout << "----> p1, p2, p3, p4 are generated!\n";
+                                                                               FormalismI::m1sq, FormalismI::m2sq, FormalismI::m3sq, FormalismI::m4sq);
+        std::cout << "----> p1, p2, p3, p4 are generated!";
         // this function makes the decay to the muons
         std::vector<std::vector<double> > qs = Generator::decay_p(ps[0], mMu*mMu, mMu*mMu, 0.3);
         std::vector<double> input_vectors[] = {ps[0],ps[1],ps[2],ps[3],qs[0],qs[1]};
-        std::cout << "----> An artificial event is generated!\n";
+        std::cout << " q1, q2 are generated!\n";
 
         double density = FormalismI::density(isobars, couplings, input_vectors);
         std::cout << "----> Final result is " << density << "\n";
 
-
         /* in order to speed the calculations, one can do:
 
-        1) precalculate the basis functions for the event
-        FormalismI::struct_map stmap; FormalismI::construct_structres(stmap, input_vectors);
+           1) precalculate the basis functions for the event
+           FormalismI::struct_map stmap; FormalismI::construct_structres(stmap, input_vectors);
 
-        2) get s and t
-        double s = inv_masssq_of_sum(ps[2],ps[3]), t = inv_masssq_of_sum(ps[0],ps[3]);
+           2) get s and t
+           double s = inv_masssq_of_sum(ps[2],ps[3]), t = inv_masssq_of_sum(ps[0],ps[3]);
 
-        3) call density
-        double density = FormalismI::density(isobars, couplings, s,t, stmap);
+           3) call density
+           double density = FormalismI::density(isobars, couplings, s,t, stmap);
 
-        */
-
+         */
 
         return 0.0;
 }
