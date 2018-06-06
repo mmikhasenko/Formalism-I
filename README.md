@@ -8,6 +8,7 @@ The folder `cpp-implementation` contains the c++ version of the formalism and th
   - The file `FormalismI.cc` provides the functionality to compute the amplitude.
   - The file `Generator.cc` gives the set of functions to generate four-vectors
   - The file `Example.cc` shows the usage example: the amplitude and density is computed for a single event.
+  - The file `DalitzPlot.cc` generate events according to the phase space and weight them with the density calculated using the formalism. The program outputs `s`,`t`, and the `weight`.`
 
 ### How to compile and run the program
 The Clebsch-Gordon coefficients are called from `GSL`-library.
