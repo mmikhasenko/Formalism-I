@@ -138,7 +138,7 @@ double beta_zero(char ch, uint j, double x, double zx) {
 
 double beta_plus(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
-        double val = 4*m1sq*pow(pq,j)/(4*M_PI*lambda1x(ch,x)) * (x+m1sq-mxsq(ch))/(sqrt2*m1sq)*
+        double val = 4*m1sq*pow(pq,j)/(4*M_PI) * (x+m1sq-mxsq(ch))/(sqrt2*m1sq)*
                      sqrt((2*j+1)*(2*j+3))*(
                 SpecialFunc::clebsch_gordon(j+1,0,1,0,j,0) *
                 SpecialFunc::wignerd_hat(j,0,0,zx)/sqrt2 +
@@ -189,7 +189,7 @@ void construct_C(std::vector<double> &C, const std::vector<double> &pi, const st
         double misq = inv_masssq(pi);
         double mjsq = inv_masssq(pj);
         for (uint i = 0; i < 4; i++) C[i] = pi[i]+pj[i];
-        double s_t = inv_masssq(C);
+        double s_t = inv_masssq(C); // std::cout << "s_t = " << s_t << "\n";
         for (uint i = 0; i < 4; i++) C[i] = pi[i]-pj[i] + (misq-mjsq)/s_t * C[i];
 }
 
@@ -232,18 +232,23 @@ double attach_leptons(const std::vector<double> &L, const std::vector<double> &R
 
 typedef std::map<std::pair<std::pair<char,char>,std::pair<char,char> >, double > struct_map;
 
-void construct_structres(struct_map &fvmap, const std::vector<double> vecs[6]) {
+std::vector<double> operator-(const std::vector<double> &v) {
+        std::vector<double> vt{-v[0],-v[1],-v[2],-v[3]};
+        return vt;
+}
+
+void construct_structres(struct_map &fvmap, const std::vector<std::vector<double> > &vecs) {
         // get notations from the paper
         auto p1 = vecs[0], p2 = vecs[1], p3 = vecs[2], p4 = vecs[3];
         auto q1 = vecs[4], q2 = vecs[5];
         std::vector<double> v(4);
         std::map<std::pair<char,char>, std::vector<double> > fvstruct;
-        construct_C(v,p3,p4);    fvstruct[std::make_pair('s','C')] = v;
-        construct_B(v,p3,p4);    fvstruct[std::make_pair('s','B')] = v;
-        construct_D(v,p1,p2,p3); fvstruct[std::make_pair('s','D')] = v;
-        construct_C(v,p2,p4);    fvstruct[std::make_pair('t','C')] = v;
-        construct_B(v,p2,p4);    fvstruct[std::make_pair('t','B')] = v;
-        construct_D(v,p1,p3,p2); fvstruct[std::make_pair('t','D')] = v;
+        construct_C(v,p3,p4);     fvstruct[std::make_pair('s','C')] = v;
+        construct_B(v,p3,p4);     fvstruct[std::make_pair('s','B')] = v;
+        construct_D(v,-p1,p2,p3); fvstruct[std::make_pair('s','D')] = v;
+        construct_C(v,p2,-p4);    fvstruct[std::make_pair('t','C')] = v;
+        construct_B(v,p2,-p4);    fvstruct[std::make_pair('t','B')] = v;
+        construct_D(v,p1,p3,p2);  fvstruct[std::make_pair('t','D')] = v;
 
         for (auto & i : fvstruct)
                 for (auto & j : fvstruct)
@@ -268,13 +273,13 @@ double xi_beta_delta(char Zi, char ch, uint j, uint l, double x, double zx) {
         std::cerr << "Error: the switch-case did not work!\n";
 }
 
-cd V_form(char ch_i, uint j_i, uint l_i,
-          char ch_j, uint j_j, uint l_j,
-          double s, double t,
-          const struct_map &st_map) {
+double V_form(char ch_i, uint j_i, uint l_i,
+              char ch_j, uint j_j, uint l_j,
+              double s, double t,
+              const struct_map &st_map) {
 
         // calculate the sum
-        cd val = 0;
+        double val = 0;
         for (char Zi : {'B', 'C', 'D'}) {
                 for (char Zj : {'B', 'C', 'D'}) {
                         double fvc_ij = st_map.at(std::make_pair(std::make_pair(ch_i, Zi),std::make_pair(ch_j, Zj)));
@@ -309,30 +314,30 @@ double density(const std::vector<isobar> &isobars, const std::vector<cd> &coupli
                         auto iso_j = isobars[j];
 
                         // get particular matrix elements
-                        cd heavy_part_ij = FormalismI::V_form(iso_i.ch, iso_i.j, iso_i.l,
-                                                              iso_j.ch, iso_j.j, iso_j.l,
-                                                              s,t, st_map);
+                        double heavy_part_ij = V_form(iso_i.ch, iso_i.j, iso_i.l,
+                                                      iso_j.ch, iso_j.j, iso_j.l,
+                                                      s,t, st_map);
                         cd density_ij =
-                                iso_i.amp(FormalismI::x(iso_i.ch,s,t)) *
+                                iso_i.amp(x(iso_i.ch,s,t)) *
                                 heavy_part_ij *
-                                std::conj(iso_j.amp(FormalismI::x(iso_j.ch,s,t)));
+                                std::conj(iso_j.amp(x(iso_j.ch,s,t)));
 
                         //-----the-bilinear-form-for-couplings-----//
                         density += ci * density_ij * conj(cj);
                         //-----------------------------------------//
                 }
         }
-        std::cout << "Imag part suppose to be zero! Rho(re,im) = " << density << "\n";
         return real(density);
 }
 
 // combined version
-double density(const std::vector<isobar> &isobars, const std::vector<cd> &couplings,
-               const std::vector<double> ps[6]) {
+double density(const std::vector<isobar> &isobars,
+               const std::vector<cd> &couplings,
+               const std::vector<std::vector<double> > &ps) {
+        // get s and t
+        double s = inv_masssq_of_sum(ps[2],ps[3]), t = inv_masssq_of_sum(ps[0],ps[2]);
         // calculate tensor stuctures
         struct_map stmap; FormalismI::construct_structres(stmap, ps);
-        // get s and t
-        double s = inv_masssq_of_sum(ps[2],ps[3]), t = inv_masssq_of_sum(ps[0],ps[3]);
         // call density
         return density(isobars, couplings, s, t, stmap);
 }
