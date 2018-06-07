@@ -192,7 +192,7 @@ void construct_C(std::vector<double> &C, const std::vector<double> &pi, const st
         double mjsq = inv_masssq(pj);
         for (uint i = 0; i < 4; i++) C[i] = pi[i]+pj[i];
         double s_t = inv_masssq(C); // std::cout << "s_t = " << s_t << "\n";
-        for (uint i = 0; i < 4; i++) C[i] = pi[i]-pj[i] + (misq-mjsq)/s_t * C[i];
+        for (uint i = 0; i < 4; i++) C[i] = pi[i]-pj[i] - (misq-mjsq)/s_t * (pi[i]+pj[i]);
 }
 
 void construct_B(std::vector<double> &B, const std::vector<double> &pi, const std::vector<double> &pj) {
@@ -229,6 +229,8 @@ double attach_leptons(const std::vector<double> &L, const std::vector<double> &R
         double Lq1 = fourv_prod(L,q1), Lq2 = fourv_prod(L,q2);
         double Rq1 = fourv_prod(R,q1), Rq2 = fourv_prod(R,q2);
         double LR = fourv_prod(L,R);
+
+        // return fourv_prod(q1q2,L)*fourv_prod(q1q2,R)/msq-LR;  // suppose to give the same result
         return Lq1*Rq2 + Lq2*Rq1 - msq/2.0*LR;
 }
 
@@ -252,6 +254,13 @@ void construct_structres(struct_map &fvmap, const std::vector<std::vector<double
         construct_B(v,p2,-p4);    fvstruct[std::make_pair('t','B')] = v;
         construct_D(v,p1,p3,p2);  fvstruct[std::make_pair('t','D')] = v;
 
+        // the part was used for debugging
+        // for (auto & i : fvstruct)
+        //         for (auto & j : fvstruct) {
+        //                 fvmap[std::make_pair(i.first,j.first)] =
+        //                         (i.first.second=='C' && j.first.second=='C') ?
+        //                                 attach_leptons(i.second,j.second, q1, q2) : 0.0;
+        //         }
         for (auto & i : fvstruct)
                 for (auto & j : fvstruct)
                         fvmap[std::make_pair(i.first,j.first)] = attach_leptons(i.second,j.second, q1, q2);

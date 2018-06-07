@@ -90,8 +90,8 @@ int main() {
         // vector of couplings
         std::vector<cd> couplings(isobars.size());
         // the values are to be set
-        couplings[0] = cd(0.0, 0.0);
-        couplings[1] = cd(5.0, 0.0);
+        couplings[0] = cd(1.0, 0.0);
+        couplings[1] = cd(0.0, 0.0);
         // std::cout << "----> The isobars are created!\n";
 
         // ----------------------------------------
@@ -100,7 +100,7 @@ int main() {
         std::uniform_real_distribution<> dist_cosT(-1.0, 1.0);
         std::uniform_real_distribution<> dist_phi(-M_PI, M_PI);
 
-        // create s-distibutrion
+        // create s-distibutrion according to the projected phase space
         auto density = [](double s) -> double {
                                return sqrt(FormalismI::lambda12(s)*FormalismI::lambda34(s))/s;
                        };
@@ -114,8 +114,10 @@ int main() {
         }
         std::piecewise_linear_distribution<> dist_s(sv.begin(), sv.end(), w.begin());
 
+
         // loop over the events
-        for (uint i = 0; i < 10000; i++) {
+        const uint Nev = 10000;
+        for (uint i = 0; i < Nev; i++) {
 
                 double s_input = dist_s(en);
                 double cosTh = dist_cosT(en);
