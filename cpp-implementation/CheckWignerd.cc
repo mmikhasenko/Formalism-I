@@ -15,6 +15,12 @@ int main() {
                 },
                 [](double z) -> double {
                         return SpecialFunc::wignerd(1,-1,0,z);
+                },
+                [](double z) -> double {
+                        return SpecialFunc::wignerd_hat(1,0,0,z);
+                },
+                [](double z) -> double {
+                        return SpecialFunc::wignerd_hat(1,1,0,z);
                 }
         };
         std::vector<std::function<double(double)> > gs = {
@@ -28,6 +34,12 @@ int main() {
                 [](double z) -> double {
                         double theta = acos(z);
                         return sin(theta)/sqrt(2);
+                },
+                [](double z) -> double {
+                        return z;
+                },
+                [](double z) -> double {
+                        return -1.0/sqrt(2);
                 }
         };
 

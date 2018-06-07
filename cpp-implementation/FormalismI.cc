@@ -72,12 +72,14 @@ double lambda24(double x) {
 };
 double px(char ch, double x) {
         check(ch);
-        return (ch=='s') ? sqrt(LAMBDA(x,m1sq,m2sq))/(2*sqrt(x)) :
+        return (ch=='s') ?
+               sqrt(LAMBDA(x,m1sq,m2sq))/(2*sqrt(x)) :
                sqrt(LAMBDA(x,m1sq,m3sq))/(2*sqrt(x));
 }
 double qx(char ch, double x) {
         check(ch);
-        return (ch=='s') ? sqrt(LAMBDA(x,m3sq,m4sq))/(2*sqrt(x)) :
+        return (ch=='s') ?
+               sqrt(LAMBDA(x,m3sq,m4sq))/(2*sqrt(x)) :
                sqrt(LAMBDA(x,m2sq,m4sq))/(2*sqrt(x));
 }
 double x(char ch, double s, double t) {
@@ -109,8 +111,8 @@ double xi_zero(char ch, uint j, double x, double zx) {
 
 double xi_plus(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
-        double val = pow(pq,j-1)/(4*M_PI*sqrt2)*sqrt((2*j+1)*(2*j-1)) *
-                     SpecialFunc::clebsch_gordon(j-1,0,1,1,j,1) *
+        double val = pow(pq,j-1)*lambda1x(ch,x)/(4*M_PI*sqrt2)*sqrt((2*j+1)*(2*j+3)) *
+                     SpecialFunc::clebsch_gordon(j+1,0,1,1,j,1) *
                      SpecialFunc::wignerd_hat(j,1,0,zx);
         return val;
 }
@@ -233,7 +235,7 @@ double attach_leptons(const std::vector<double> &L, const std::vector<double> &R
 typedef std::map<std::pair<std::pair<char,char>,std::pair<char,char> >, double > struct_map;
 
 std::vector<double> operator-(const std::vector<double> &v) {
-        std::vector<double> vt{-v[0],-v[1],-v[2],-v[3]};
+        std::vector<double> vt {-v[0],-v[1],-v[2],-v[3]};
         return vt;
 }
 
@@ -280,8 +282,8 @@ double V_form(char ch_i, uint j_i, uint l_i,
 
         // calculate the sum
         double val = 0;
-        for (char Zi : {'B', 'C', 'D'}) {
-                for (char Zj : {'B', 'C', 'D'}) {
+        for (char Zi : {'C', 'B', 'D'}) {
+                for (char Zj : {'C', 'B', 'D'}) {
                         double fvc_ij = st_map.at(std::make_pair(std::make_pair(ch_i, Zi),std::make_pair(ch_j, Zj)));
                         // this block can be speeded up
                         double xbd_i = xi_beta_delta(Zi, ch_i, j_i, l_i, x(ch_i,s,t), zx(ch_i,s,t)); //! CAN BE PRECALCULATED
