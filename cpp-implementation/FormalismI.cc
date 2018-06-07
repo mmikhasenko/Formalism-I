@@ -94,9 +94,9 @@ double zx(char ch, double s, double t) {
                (t*(s-u)+(m1sq-m3sq)*(m2sq-m4sq))/sqrt(lambda13(t)*lambda24(t));
 }
 
-//-------------------------------XI-FUNCTIONS-----------------------------------//
+//-------------------------------zeta-FUNCTIONS-----------------------------------//
 
-double xi_minu(char ch, uint j, double x, double zx) {
+double zeta_minu(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
         double val = pow(pq,j-1)/(4*M_PI*sqrt2)*sqrt((2*j+1)*(2*j-1)) *
                      SpecialFunc::clebsch_gordon(j-1,0,1,1,j,1) *
@@ -104,12 +104,12 @@ double xi_minu(char ch, uint j, double x, double zx) {
         return val;
 }
 
-double xi_zero(char ch, uint j, double x, double zx) {
+double zeta_zero(char ch, uint j, double x, double zx) {
         double val = 0.0;
         return val;
 }
 
-double xi_plus(char ch, uint j, double x, double zx) {
+double zeta_plus(char ch, uint j, double x, double zx) {
         double pq = px(ch,x)*qx(ch,x);
         double val = pow(pq,j-1)*lambda1x(ch,x)/(4*M_PI*sqrt2)*sqrt((2*j+1)*(2*j+3)) *
                      SpecialFunc::clebsch_gordon(j+1,0,1,1,j,1) *
@@ -117,7 +117,7 @@ double xi_plus(char ch, uint j, double x, double zx) {
         return val;
 }
 
-std::vector<std::function<double(char,uint,double,double)> > xi = {xi_minu, xi_zero, xi_plus};
+std::vector<std::function<double(char,uint,double,double)> > zeta = {zeta_minu, zeta_zero, zeta_plus};
 
 //-------------------------------BETA-FUNCTIONS---------------------------------//
 
@@ -259,8 +259,8 @@ void construct_structres(struct_map &fvmap, const std::vector<std::vector<double
 
 //------------------------------------------------------------------------------//
 
-// combined function for the xi, beta, delta
-double xi_beta_delta(char Zi, char ch, uint j, uint l, double x, double zx) {
+// combined function for the zeta, beta, delta
+double zeta_beta_delta(char Zi, char ch, uint j, uint l, double x, double zx) {
         if (abs(j-l) > 1) {
                 // std::cerr << "Note: abs(j-l) > 1\n";
                 return 0.0;
@@ -268,7 +268,7 @@ double xi_beta_delta(char Zi, char ch, uint j, uint l, double x, double zx) {
         uint f_index = l-j+1;
 
         switch(Zi) {
-        case 'C': return xi.at(f_index)(ch, j, x, zx);
+        case 'C': return zeta.at(f_index)(ch, j, x, zx);
         case 'B': return beta.at(f_index)(ch, j, x, zx);
         case 'D': return delta.at(f_index)(ch, j, x, zx);
         }
@@ -286,8 +286,8 @@ double V_form(char ch_i, uint j_i, uint l_i,
                 for (char Zj : {'C', 'B', 'D'}) {
                         double fvc_ij = st_map.at(std::make_pair(std::make_pair(ch_i, Zi),std::make_pair(ch_j, Zj)));
                         // this block can be speeded up
-                        double xbd_i = xi_beta_delta(Zi, ch_i, j_i, l_i, x(ch_i,s,t), zx(ch_i,s,t)); //! CAN BE PRECALCULATED
-                        double xbd_j = xi_beta_delta(Zj, ch_j, j_j, l_j, x(ch_j,s,t), zx(ch_j,s,t)); //! CAN BE PRECALCULATED
+                        double xbd_i = zeta_beta_delta(Zi, ch_i, j_i, l_i, x(ch_i,s,t), zx(ch_i,s,t)); //! CAN BE PRECALCULATED
+                        double xbd_j = zeta_beta_delta(Zj, ch_j, j_j, l_j, x(ch_j,s,t), zx(ch_j,s,t)); //! CAN BE PRECALCULATED
                         fvc_ij *= xbd_i*xbd_j;
                         // --------------------------
                         val += fvc_ij;
