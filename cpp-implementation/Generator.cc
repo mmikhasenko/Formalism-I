@@ -51,6 +51,24 @@ std::vector<std::vector<double> > decay_p(const std::vector<double> &p,
                      };
         boost(rest_frame_q1, p[3]/sqrt(msq));
         boost(rest_frame_q2, p[3]/sqrt(msq));
+
+        // rotate
+        auto rot = [](std::vector<double> &p, double theta, double phi) -> void {
+                           //theta
+                           double px =  p[0]*cos(theta)+p[2]*sin(theta);
+                           double pz = -p[0]*sin(theta)+p[2]*cos(theta);
+                           p[0] = px; p[2] = pz;
+                           // phi
+                           px = p[0]*cos(phi)-p[1]*sin(phi);
+                           double py = p[0]*sin(phi)+p[1]*cos(phi);
+                           p[0] = px; p[1] = py;
+                   };
+        double vec_psq = p[0]*p[0]+p[1]*p[1]+p[2]*p[2];
+        double theta_p1 = vec_psq > 0.0 ? acos(p[2]/sqrt(vec_psq)) : 0.0;
+        double phi_p1 = atan2(p[1], p[0]);
+        rot(rest_frame_q1, theta_p1, phi_p1);
+        rot(rest_frame_q2, theta_p1, phi_p1);
+
         return {rest_frame_q1, rest_frame_q2};
 }
 

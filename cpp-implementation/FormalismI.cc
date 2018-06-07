@@ -191,7 +191,7 @@ void construct_C(std::vector<double> &C, const std::vector<double> &pi, const st
         double misq = inv_masssq(pi);
         double mjsq = inv_masssq(pj);
         for (uint i = 0; i < 4; i++) C[i] = pi[i]+pj[i];
-        double s_t = inv_masssq(C); // std::cout << "s_t = " << s_t << "\n";
+        double s_t = inv_masssq(C);
         for (uint i = 0; i < 4; i++) C[i] = pi[i]-pj[i] - (misq-mjsq)/s_t * (pi[i]+pj[i]);
 }
 

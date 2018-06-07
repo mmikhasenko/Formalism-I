@@ -91,7 +91,7 @@ int main() {
         std::vector<cd> couplings(isobars.size());
         // the values are to be set
         couplings[0] = cd(1.0, 0.0);
-        couplings[1] = cd(0.0, 0.0);
+        couplings[1] = cd(-3.0, -0.1);
         // std::cout << "----> The isobars are created!\n";
 
         // ----------------------------------------
@@ -118,7 +118,6 @@ int main() {
         // loop over the events
         const uint Nev = 10000;
         for (uint i = 0; i < Nev; i++) {
-
                 double s_input = dist_s(en);
                 double cosTh = dist_cosT(en);
                 double phi = dist_phi(en);
@@ -135,7 +134,8 @@ int main() {
                 //         std::cout << "\n";
                 // }
                 double density = FormalismI::density(isobars, couplings, input_vectors);
-                std::cout << "s, t, density: " << s_input << " " << inv_masssq_of_sum(ps[0], ps[2])<< " " << density << "\n";
+                double t_input = inv_masssq_of_sum(ps[0], ps[2]);
+                std::cout << "s, t, density: " << s_input << " " << t_input << " " << density << "\n";
         }
 
         return 0.0;
