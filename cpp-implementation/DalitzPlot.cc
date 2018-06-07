@@ -63,7 +63,7 @@ cd Zc_bw(double t) {
 
 #define mMu  0.1134
 
-int main() {
+int main(int argc, char **argv) {
         double m1sq = FormalismI::m1sq, m2sq = FormalismI::m2sq,
                m3sq = FormalismI::m3sq, m4sq = FormalismI::m4sq;
         // ----------------------------------------
@@ -72,7 +72,7 @@ int main() {
         // fill up `isobars`-vector here
 
         // 1) K* S-wave
-        FormalismI::isobar Ks_Swave;
+        FormalismI::isobar Ks_0wave;
         Ks_Swave.ch ='s';
         Ks_Swave.j = 1;
         Ks_Swave.l = 0;
@@ -80,7 +80,7 @@ int main() {
         isobars.push_back(Ks_Swave);
 
         // 2) Zc S-wave
-        FormalismI::isobar Zc_Swave;
+        FormalismI::isobar Zc_0wave;
         Zc_Swave.ch ='t';
         Zc_Swave.j = 1;
         Zc_Swave.l = 0;
@@ -91,7 +91,7 @@ int main() {
         std::vector<cd> couplings(isobars.size());
         // the values are to be set
         couplings[0] = cd(1.0, 0.0);
-        couplings[1] = cd(-3.0, -0.1);
+        couplings[1] = cd(-2.0, 0.0);
         // std::cout << "----> The isobars are created!\n";
 
         // ----------------------------------------
@@ -114,9 +114,8 @@ int main() {
         }
         std::piecewise_linear_distribution<> dist_s(sv.begin(), sv.end(), w.begin());
 
-
         // loop over the events
-        const uint Nev = 10000;
+        const uint Nev = (argc < 2) ? 10 : atoi(argv[1]);
         for (uint i = 0; i < Nev; i++) {
                 double s_input = dist_s(en);
                 double cosTh = dist_cosT(en);

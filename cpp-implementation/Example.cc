@@ -60,7 +60,7 @@ int main() {
         // fill up `isobars`-vector here
 
         // 1) K* S-wave
-        FormalismI::isobar Ks_Swave;
+        FormalismI::isobar Ks0wave;
         Ks_Swave.ch ='s';
         Ks_Swave.j = 1;
         Ks_Swave.l = 0;
@@ -68,7 +68,7 @@ int main() {
         isobars.push_back(Ks_Swave);
 
         // 2) K* D-wave
-        FormalismI::isobar Ks_Dwave;
+        FormalismI::isobar Ks2wave;
         Ks_Dwave.ch ='s';
         Ks_Dwave.j = 1;
         Ks_Dwave.l = 2;
@@ -92,11 +92,11 @@ int main() {
         std::cout << "----> p1, p2, p3, p4 are generated!";
         // this function makes the decay to the muons
         std::vector<std::vector<double> > qs = Generator::decay_p(ps[0], mMu*mMu, mMu*mMu, 0.3);
-        std::vector<double> input_vectors[] = {ps[0],ps[1],ps[2],ps[3],qs[0],qs[1]};
+        std::vector<std::vector<double> > input_vectors{ps[0],ps[1],ps[2],ps[3],qs[0],qs[1]};
         std::cout << " q1, q2 are generated!\n";
 
         double density = FormalismI::density(isobars, couplings, input_vectors);
-        std::cout << "----> Final result is " << density << "\n";
+        std::cout << "----> The density is " << density << "\n";
 
         /* in order to speed the calculations, one can do:
 
