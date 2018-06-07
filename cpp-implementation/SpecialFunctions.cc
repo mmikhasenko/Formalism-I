@@ -10,7 +10,7 @@ namespace SpecialFunc {
 //------------------------------------------------------------------------------//
 
 double clebsch_gordon(uint j1, uint m1, uint j2, uint m2, uint j, uint m) {
-        return (j1-j2+m % 2 == 1 ? -1.0 : 1.0) * sqrt(2*j+1) *
+        return ((j1-j2+m) % 2 == 1 ? -1.0 : 1.0) * sqrt(2*j+1) *
                gsl_sf_coupling_3j(2*j1, 2*j2, 2*j, 2*m1, 2*m2, -2*m);
 }
 
