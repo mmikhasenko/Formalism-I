@@ -73,19 +73,19 @@ int main(int argc, char **argv) {
 
         // 1) K* S-wave
         FormalismI::isobar Ks_0wave;
-        Ks_Swave.ch ='s';
-        Ks_Swave.j = 1;
-        Ks_Swave.l = 0;
-        Ks_Swave.amp = IsobarParams::Ks_bw;
-        isobars.push_back(Ks_Swave);
+        Ks_0wave.ch ='s';
+        Ks_0wave.j = 1;
+        Ks_0wave.l = 0;
+        Ks_0wave.amp = IsobarParams::Ks_bw;
+        isobars.push_back(Ks_0wave);
 
         // 2) Zc S-wave
         FormalismI::isobar Zc_0wave;
-        Zc_Swave.ch ='t';
-        Zc_Swave.j = 1;
-        Zc_Swave.l = 0;
-        Zc_Swave.amp = IsobarParams::Zc_bw;
-        isobars.push_back(Zc_Swave);
+        Zc_0wave.ch ='t';
+        Zc_0wave.j = 1;
+        Zc_0wave.l = 0;
+        Zc_0wave.amp = IsobarParams::Zc_bw;
+        isobars.push_back(Zc_0wave);
 
         // vector of couplings
         std::vector<cd> couplings(isobars.size());
