@@ -60,7 +60,7 @@ int main() {
         // fill up `isobars`-vector here
 
         // 1) K* S-wave
-        FormalismI::isobar Ks0wave;
+        FormalismI::isobar Ks_0wave;
         Ks_0wave.ch ='s';
         Ks_0wave.j = 1;
         Ks_0wave.l = 0;
@@ -68,7 +68,7 @@ int main() {
         isobars.push_back(Ks_0wave);
 
         // 2) K* D-wave
-        FormalismI::isobar Ks2wave;
+        FormalismI::isobar Ks_2wave;
         Ks_2wave.ch ='s';
         Ks_2wave.j = 1;
         Ks_2wave.l = 2;
