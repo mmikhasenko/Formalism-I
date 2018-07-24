@@ -9,7 +9,7 @@
 namespace SpecialFunc {
 //------------------------------------------------------------------------------//
 
-double clebsch_gordon(uint j1, uint m1, uint j2, uint m2, uint j, uint m) {
+double clebsch_gordon(uint j1, int m1, uint j2, int m2, uint j, int m) {
         return ((j1-j2+m) % 2 == 1 ? -1.0 : 1.0) * sqrt(2*j+1) *
                gsl_sf_coupling_3j(2*j1, 2*j2, 2*j, 2*m1, 2*m2, -2*m);
 }
@@ -49,7 +49,7 @@ double jacobi_pols(uint n, uint a, uint b, double x) {
 // The reference  for the relation between WignerD and Jacobi polynomials is
 // Eq. (3.74) of L. Biedenharn, J. Louck, and P. Carruthers, Angular Momentum in Quantum Physics: Theory and Application
 // see also (B1) of the FormalismII paper.
-double wignerd_hat(uint j, uint m1, uint m2, double z) {
+double wignerd_hat(uint j, int m1, int m2, double z) {
         double factor = ((abs(m1-m2)+m1-m2)/2) % 2 == 0 ? 1.0 : -1.0;
         int am1 = abs(m1), am2 = abs(m2);
         double M = (am1 > am2) ? am1 : am2;
@@ -59,7 +59,7 @@ double wignerd_hat(uint j, uint m1, uint m2, double z) {
                jacobi_pols(j-M, abs(m1-m2),abs(m1+m2), z);
 }
 
-double wignerd(uint j, uint m1, uint m2, double z) {
+double wignerd(uint j, int m1, int m2, double z) {
         double hat = wignerd_hat(j, m1, m2, z);
         double xi = pow(sqrt(1-z),abs(m1-m2))*pow(sqrt((1+z)),abs(m1+m2));
         return hat*xi;
