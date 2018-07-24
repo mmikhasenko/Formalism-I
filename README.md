@@ -11,26 +11,28 @@ The folder `cpp-implementation` contains the c++ version of the formalism and th
   - The file `DalitzPlot.cc` generate events according to the phase space and weight them with the density calculated using the formalism. The program outputs `s`,`t`, and the `weight`.
 The program takes the number of events as the first argument.
 
+### How to run notebooks
+use [JuliaBox](https://juliabox.com), clone this repository and play around.
 
 ### How to compile and run the program
 The Clebsch-Gordon coefficients are called from `GSL`-library.
 Therefore, the program must be linked against `lgsl`.
 It is already stored at your machine because it is used by `ROOT`.
   1. First, locate the header and the library for the `gsl` dependence.
-```
+```bash
 locate gsl_sf_coupling.h
 locate libgsl.a
 ```
 You need to specify the path to folder `gsl/` where the headers are stored with the frag `-I`. The path to the library has to be given with the flag `-L`.
 
   2. Compile and link
+```bash
+g++ -std=c++11 -L${PATH_TO_GSL_LIBRARY} -I${PATH_TO_GSL_FOLDER} -o Example Example.cc -lgsl
 ```
-g++ -std=c++11 -L${PATH_TO_LIBRARY} -I${PATH_TO_GSL_FOLDER} -o Example Example.cc -lgsl
-```
+Alternatively, export the variables `PATH_TO_GSL_LIBRARY` and `PATH_TO_GSL_FOLDER`
+then use the `make`-command
+
   3. Run
-```
+```bash
 ./Example
 ```
-
-### How to run notebooks
-use [JuliaBox](https://juliabox.com), clone this repository and play around.
